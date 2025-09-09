@@ -144,7 +144,7 @@
 
     try {
       const dbRef = ref(database);
-      const snapshot = await get(child(dbRef, id + '/Value'));
+      const snapshot = await get(child(dbRef, id + '/value'));
       if (snapshot.exists()) {
         const rawValue = snapshot.val();
         const match = rawValue.match(/\d+/);
@@ -152,6 +152,7 @@
         document.getElementById("amount").textContent = amount + " ₽";
       } else {
         document.getElementById("amount").textContent = "0 ₽";
+        alert("Ошибка при получении суммы: " + e);
       }
     } catch (e) {
       alert("Ошибка при получении суммы: " + e);
