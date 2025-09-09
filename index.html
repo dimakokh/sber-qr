@@ -144,7 +144,7 @@
 
     try {
       const dbRef = ref(database);
-      const snapshot = await get(child(dbRef, id + '/value'));
+      const snapshot = await get(child(dbRef, id + '/Value'));
       if (snapshot.exists()) {
         const rawValue = snapshot.val();
         const match = rawValue.match(/\d+/);
